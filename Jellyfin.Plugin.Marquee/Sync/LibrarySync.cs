@@ -340,7 +340,7 @@ public class LibrarySync
         }
     }
 
-    private static bool SamePath(string a, string b)
+    internal static bool SamePath(string a, string b)
         => string.Equals(Path.GetFullPath(a).TrimEnd(Path.DirectorySeparatorChar), Path.GetFullPath(b).TrimEnd(Path.DirectorySeparatorChar), StringComparison.OrdinalIgnoreCase);
 
     private void LoadIndex()

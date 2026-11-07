@@ -150,9 +150,18 @@ public class MarqueeController : ControllerBase
             return BadRequest(new { error = "The folder must be a full path, like /media/marquee or D:\\Marquee." });
         }
 
-        if (!string.Equals(path, c.LibraryPath, StringComparison.Ordinal) && !string.IsNullOrEmpty(c.Key))
+        // Compare the folders, not the text: "/x/marquee/" (or the default typed out) is the same folder,
+        // and treating it as a move would delete the library it is about to keep using.
+        var newFolder = path.Length == 0 ? Plugin.DefaultLibraryPath : path;
+        if (LibrarySync.SamePath(newFolder, Plugin.DefaultLibraryPath))
         {
-            _sync.RemoveAll(); // the old folder's files; the next sync writes the new one
+            path = string.Empty;
+        }
+
+        var moved = !LibrarySync.SamePath(newFolder, Plugin.LibraryPath) && !string.IsNullOrEmpty(c.Key);
+        if (moved)
+        {
+            _sync.RemoveAll(); // the old folder's files; the sync below writes the new one
         }
 
         c.LibraryPath = path;
@@ -171,6 +180,11 @@ public class MarqueeController : ControllerBase
         }
 
         Plugin.SaveConfiguration();
+        if (moved)
+        {
+            _tasks.QueueScheduledTask<SyncTask>();
+        }
+
         return NoContent();
     }
 

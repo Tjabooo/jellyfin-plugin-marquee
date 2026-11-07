@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.1.1 — 2026-11-07
+
+- Fixed: saving the settings with the default folder typed out, or with a trailing slash, deleted the synced library (it was taken for a move to a new folder). Folders are now compared as folders.
+- Moving the folder syncs into the new one straight away instead of at the next scheduled sync.
+
 ## v0.1.0 — 2026-11-07
 
 First release.
