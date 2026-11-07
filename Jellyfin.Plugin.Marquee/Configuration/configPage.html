@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Marquee</title>
+</head>
+<body>
+    <div id="MarqueeConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+        <style>
+            #MarqueeConfigPage .mq-card { max-width: 44em; padding: 1.2em 1.4em; margin: 0 0 1.6em; border-radius: .6em; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+            #MarqueeConfigPage .mq-lead { margin: .2em 0 1.2em; opacity: .85; line-height: 1.5; max-width: 44em; }
+            #MarqueeConfigPage .mq-code { font: 600 2.6em/1.1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .22em; margin: .3em 0 .2em; user-select: all; }
+            #MarqueeConfigPage .mq-muted { opacity: .7; margin: .3em 0; line-height: 1.5; }
+            #MarqueeConfigPage .mq-error { color: #ff7b72; margin: .6em 0 0; line-height: 1.5; }
+            #MarqueeConfigPage .mq-error:empty, #MarqueeConfigPage [hidden] { display: none !important; }
+            #MarqueeConfigPage .mq-row { display: flex; flex-wrap: wrap; gap: .6em; align-items: center; margin-top: 1em; }
+            #MarqueeConfigPage .mq-row .emby-button { margin: 0; }
+            #MarqueeConfigPage .mq-state { display: grid; grid-template-columns: max-content 1fr; gap: .35em 1.2em; margin: .4em 0 0; }
+            #MarqueeConfigPage .mq-state dt { opacity: .65; }
+            #MarqueeConfigPage .mq-state dd { margin: 0; overflow-wrap: anywhere; }
+            #MarqueeConfigPage h2 { margin: 0 0 .4em; font-size: 1.15em; }
+        </style>
+        <div data-role="content">
+            <div class="content-primary">
+                <div class="verticalSection">
+                    <h1 class="sectionTitle">Marquee</h1>
+                    <p class="mq-lead">Shows a Marquee library in this Jellyfin. Films and shows appear as normal Jellyfin libraries, play from the Marquee server, and what you watch here is remembered in Marquee too.</p>
+                </div>
+
+                <!-- Not connected: address, then the code to enter in Marquee -->
+                <div class="mq-card" id="mqConnect" hidden>
+                    <h2>Connect to Marquee</h2>
+                    <form id="mqConnectForm">
+                        <div class="inputContainer">
+                            <input is="emby-input" type="text" id="mqUrl" label="Marquee address" placeholder="https://marquee.example.com" autocomplete="url" spellcheck="false" required />
+                            <div class="fieldDescription">The address you open Marquee at in a browser. Use the home-network address (like http://192.168.1.10:8080) if this Jellyfin is in the same house.</div>
+                        </div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button" id="mqStart"><span>Get a code</span></button>
+                    </form>
+                    <div id="mqPairing" hidden>
+                        <p class="mq-muted">In Marquee, open <b>Settings</b>, find <b>Jellyfin</b> and enter this code:</p>
+                        <div class="mq-code" id="mqCode"></div>
+                        <p class="mq-muted" id="mqPairNote">Waiting for the code…</p>
+                        <div class="mq-row"><button is="emby-button" type="button" class="raised emby-button" id="mqCancel"><span>Cancel</span></button></div>
+                    </div>
+                    <p class="mq-error" id="mqConnectError" role="alert"></p>
+                </div>
+
+                <!-- Connected -->
+                <div class="mq-card" id="mqConnected" hidden>
+                    <h2>Connected</h2>
+                    <dl class="mq-state">
+                        <dt>Marquee</dt><dd id="mqServer"></dd>
+                        <dt>Library of</dt><dd id="mqAccount"></dd>
+                        <dt>Last sync</dt><dd id="mqLastSync"></dd>
+                    </dl>
+                    <p class="mq-error" id="mqSyncError" role="alert"></p>
+                    <div class="mq-row">
+                        <button is="emby-button" type="button" class="raised button-submit emby-button" id="mqSyncNow"><span>Sync now</span></button>
+                        <button is="emby-button" type="button" class="raised emby-button" id="mqDisconnect"><span>Disconnect</span></button>
+                    </div>
+                </div>
+
+                <div class="mq-card" id="mqOptions" hidden>
+                    <h2>Options</h2>
+                    <form id="mqOptionsForm">
+                        <div class="inputContainer">
+                            <input is="emby-input" type="text" id="mqPath" label="Folder for Marquee's files" spellcheck="false" />
+                            <div class="fieldDescription" id="mqPathHint">Small .strm files that point at Marquee, one per video, plus subtitles. Leave empty for the default.</div>
+                        </div>
+                        <div class="inputContainer">
+                            <input is="emby-input" type="number" id="mqInterval" label="Check Marquee every (minutes)" min="5" max="1440" />
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label><input is="emby-checkbox" type="checkbox" id="mqCreateLibraries" /><span>Add “Marquee Films” and “Marquee Shows” libraries</span></label>
+                            <div class="fieldDescription checkboxFieldDescription">Turn off to add the Films and Shows folders to libraries yourself.</div>
+                        </div>
+                        <div class="checkboxContainer checkboxContainer-withDescription">
+                            <label><input is="emby-checkbox" type="checkbox" id="mqReportProgress" /><span>Send watch progress to Marquee</span></label>
+                            <div class="fieldDescription checkboxFieldDescription">Continue watching in Marquee picks up where Jellyfin stopped. Everyone on this Jellyfin counts as the connected Marquee account.</div>
+                        </div>
+                        <div class="checkboxContainer">
+                            <label><input is="emby-checkbox" type="checkbox" id="mqSubtitles" /><span>Copy subtitles saved in Marquee</span></label>
+                        </div>
+                        <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
+                        <p class="mq-error" id="mqOptionsError" role="alert"></p>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            (function () {
+                var page = document.querySelector('#MarqueeConfigPage');
+                var $ = function (id) { return page.querySelector('#' + id); };
+                var pollTimer = null, statusTimer = null, pollId = null, pollUntil = 0;
+
+                function call(method, path, body) {
+                    var options = { type: method, url: ApiClient.getUrl(path) };
+                    if (body !== undefined) { options.data = JSON.stringify(body); options.contentType = 'application/json'; }
+                    return ApiClient.fetch(options).then(function (r) {
+                        if (r.status === 204) return null;
+                        return r.json().then(function (data) {
+                            if (!r.ok) throw new Error((data && data.error) || ('Jellyfin answered ' + r.status));
+                            return data;
+                        }, function () { if (!r.ok) throw new Error('Jellyfin answered ' + r.status); return null; });
+                    }, function (r) {
+                        // ApiClient rejects with the Response on error statuses.
+                        if (r && typeof r.json === 'function') return r.json().then(function (d) { throw new Error((d && d.error) || ('Jellyfin answered ' + r.status)); }, function () { throw new Error('Jellyfin answered ' + r.status); });
+                        throw r instanceof Error ? r : new Error('Couldn’t reach Jellyfin.');
+                    });
+                }
+
+                function when(iso) {
+                    if (!iso) return 'Not yet';
+                    var d = new Date(iso), s = Math.round((Date.now() - d.getTime()) / 1000);
+                    if (s < 60) return 'Just now';
+                    if (s < 3600) return Math.round(s / 60) + ' min ago';
+                    return d.toLocaleString();
+                }
+
+                function render(s) {
+                    $('mqConnect').hidden = s.connected;
+                    $('mqConnected').hidden = !s.connected;
+                    $('mqOptions').hidden = !s.connected;
+                    if (!s.connected) {
+                        if (!$('mqUrl').value && s.serverUrl) $('mqUrl').value = s.serverUrl;
+                        $('mqConnectError').textContent = s.lastError || '';
+                        return;
+                    }
+                    $('mqServer').textContent = s.serverUrl;
+                    $('mqAccount').textContent = s.account || '…';
+                    $('mqLastSync').textContent = s.syncing ? 'Syncing now…' : when(s.lastSync) + (s.lastSyncSummary ? ' · ' + s.lastSyncSummary : '');
+                    $('mqSyncError').textContent = s.lastError || '';
+                    $('mqSyncNow').disabled = s.syncing;
+                    if (!page.dataset.optionsLoaded) {
+                        page.dataset.optionsLoaded = '1';
+                        $('mqPath').value = s.customLibraryPath || '';
+                        $('mqPath').setAttribute('placeholder', s.defaultLibraryPath);
+                        $('mqPathHint').textContent = 'Small .strm files that point at Marquee, one per video, plus subtitles. Empty: ' + s.defaultLibraryPath;
+                        $('mqInterval').value = s.syncIntervalMinutes;
+                        $('mqCreateLibraries').checked = s.createLibraries;
+                        $('mqReportProgress').checked = s.reportProgress;
+                        $('mqSubtitles').checked = s.downloadSubtitles;
+                    }
+                    clearTimeout(statusTimer);
+                    if (s.syncing || !s.lastSync) statusTimer = setTimeout(refresh, 2000);
+                }
+
+                function refresh() {
+                    return call('GET', 'Marquee/Status').then(render).catch(function (e) { $('mqConnectError').textContent = e.message; });
+                }
+
+                function stopPairing() {
+                    clearTimeout(pollTimer); pollTimer = null; pollId = null;
+                    $('mqPairing').hidden = true; $('mqConnectForm').hidden = false;
+                }
+
+                function poll() {
+                    if (!pollId) return;
+                    if (Date.now() > pollUntil) { stopPairing(); $('mqConnectError').textContent = 'The code expired. Get a new one.'; return; }
+                    call('GET', 'Marquee/Pair/Poll?id=' + encodeURIComponent(pollId)).then(function (r) {
+                        if (!pollId) return;
+                        if (r.state === 'approved') {
+                            stopPairing();
+                            Dashboard.alert('Connected to Marquee. The first sync is running; your films and shows appear in a minute or two.');
+                            refresh();
+                        } else if (r.state === 'waiting') {
+                            var left = Math.max(0, Math.round((pollUntil - Date.now()) / 60000));
+                            $('mqPairNote').textContent = 'Waiting for the code… (valid for ' + (left || 'less than 1') + ' more min)';
+                            pollTimer = setTimeout(poll, 2000);
+                        } else {
+                            stopPairing(); $('mqConnectError').textContent = 'The code expired. Get a new one.';
+                        }
+                    }).catch(function (e) { $('mqPairNote').textContent = e.message + ' Trying again…'; pollTimer = setTimeout(poll, 5000); });
+                }
+
+                $('mqConnectForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    $('mqConnectError').textContent = '';
+                    $('mqStart').disabled = true;
+                    call('POST', 'Marquee/Pair/Start', { serverUrl: $('mqUrl').value }).then(function (r) {
+                        $('mqUrl').value = r.serverUrl;
+                        $('mqCode').textContent = r.code;
+                        pollId = r.poll; pollUntil = Date.now() + r.expiresIn * 1000;
+                        $('mqConnectForm').hidden = true; $('mqPairing').hidden = false;
+                        $('mqPairNote').textContent = 'Waiting for the code…';
+                        pollTimer = setTimeout(poll, 2000);
+                    }).catch(function (err) { $('mqConnectError').textContent = err.message; })
+                      .then(function () { $('mqStart').disabled = false; });
+                });
+
+                $('mqCancel').addEventListener('click', stopPairing);
+
+                $('mqSyncNow').addEventListener('click', function () {
+                    $('mqSyncNow').disabled = true;
+                    call('POST', 'Marquee/Sync').then(function () { setTimeout(refresh, 800); })
+                        .catch(function (e) { $('mqSyncError').textContent = e.message; $('mqSyncNow').disabled = false; });
+                });
+
+                $('mqDisconnect').addEventListener('click', function () {
+                    Dashboard.confirm('Jellyfin stops showing the Marquee library and its files here are deleted. You can connect again any time.', 'Disconnect from Marquee?', function (ok) {
+                        if (!ok) return;
+                        call('POST', 'Marquee/Disconnect').then(function () { delete page.dataset.optionsLoaded; refresh(); })
+                            .catch(function (e) { $('mqSyncError').textContent = e.message; });
+                    });
+                });
+
+                $('mqOptionsForm').addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    $('mqOptionsError').textContent = '';
+                    call('POST', 'Marquee/Settings', {
+                        libraryPath: $('mqPath').value,
+                        syncIntervalMinutes: parseInt($('mqInterval').value, 10) || 15,
+                        createLibraries: $('mqCreateLibraries').checked,
+                        reportProgress: $('mqReportProgress').checked,
+                        downloadSubtitles: $('mqSubtitles').checked
+                    }).then(function () { Dashboard.processPluginConfigurationUpdateResult(); })
+                      .catch(function (err) { $('mqOptionsError').textContent = err.message; });
+                });
+
+                page.addEventListener('pageshow', function () { delete page.dataset.optionsLoaded; refresh(); });
+                page.addEventListener('pagehide', function () { clearTimeout(statusTimer); stopPairing(); });
+            })();
+        </script>
+    </div>
+</body>
+</html>

@@ -1,0 +1,12 @@
+[
+  {
+    "guid": "6d3f8a52-1c4e-4b7a-9f2d-8e5b3c71a904",
+    "name": "Marquee",
+    "description": "Your Marquee library in Jellyfin: films and shows stream from the Marquee server, sign-in with a code, and watch progress goes back to Marquee.",
+    "overview": "Watch your Marquee library in Jellyfin",
+    "owner": "Tjabooo",
+    "category": "General",
+    "imageUrl": "https://raw.githubusercontent.com/Tjabooo/jellyfin-plugin-marquee/main/docs/icon.png",
+    "versions": []
+  }
+]

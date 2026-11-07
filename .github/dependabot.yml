@@ -1,0 +1,13 @@
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: /
+    schedule:
+      interval: weekly
+    # The Jellyfin packages pin the oldest server version each build supports; don't bump them.
+    ignore:
+      - dependency-name: "Jellyfin.*"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
