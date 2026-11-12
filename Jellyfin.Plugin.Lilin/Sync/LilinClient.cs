@@ -10,26 +10,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediaBrowser.Common.Net;
 
-namespace Jellyfin.Plugin.Marquee.Sync;
+namespace Jellyfin.Plugin.Lilin.Sync;
 
-/// <summary>Marquee's Jellyfin API (/c/jf/v1 on the Marquee server).</summary>
-public class MarqueeClient
+/// <summary>Lilin's Jellyfin API (/c/jf/v1 on the Lilin server).</summary>
+public class LilinClient
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
     private readonly IHttpClientFactory _httpClientFactory;
 
-    public MarqueeClient(IHttpClientFactory httpClientFactory)
+    public LilinClient(IHttpClientFactory httpClientFactory)
     {
         _httpClientFactory = httpClientFactory;
     }
 
-    /// <summary>"marquee.example.com" → "https://marquee.example.com", without a trailing slash.</summary>
+    /// <summary>"lilin.example.com" → "https://lilin.example.com", without a trailing slash.</summary>
     public static string NormalizeUrl(string? url)
     {
         var u = (url ?? string.Empty).Trim().TrimEnd('/');
         if (u.Length == 0)
         {
-            throw new MarqueeException("Enter the address you open Marquee at.");
+            throw new LilinException("Enter the address you open Lilin at.");
         }
 
         if (!u.Contains("://", StringComparison.Ordinal))
@@ -46,7 +46,7 @@ public class MarqueeClient
 
         if (!Uri.TryCreate(u, UriKind.Absolute, out var parsed) || (parsed.Scheme != "http" && parsed.Scheme != "https"))
         {
-            throw new MarqueeException("That isn't a web address.");
+            throw new LilinException("That isn't a web address.");
         }
 
         return parsed.GetLeftPart(UriPartial.Path).TrimEnd('/');
@@ -58,8 +58,8 @@ public class MarqueeClient
     public Task<PairPoll> PollPairingAsync(string serverUrl, string poll, CancellationToken ct)
         => SendAsync<PairPoll>(HttpMethod.Get, serverUrl, "/c/jf/v1/pair/poll?id=" + Uri.EscapeDataString(poll), null, null, ct);
 
-    public Task<MarqueeLibrary> GetLibraryAsync(string serverUrl, string key, CancellationToken ct)
-        => SendAsync<MarqueeLibrary>(HttpMethod.Get, serverUrl, "/c/jf/v1/library", key, null, ct);
+    public Task<LilinLibrary> GetLibraryAsync(string serverUrl, string key, CancellationToken ct)
+        => SendAsync<LilinLibrary>(HttpMethod.Get, serverUrl, "/c/jf/v1/library", key, null, ct);
 
     public Task<JsonElement> ReportProgressAsync(string serverUrl, string key, string mediaKey, double? position, double? duration, bool finished, CancellationToken ct)
         => SendAsync<JsonElement>(HttpMethod.Post, serverUrl, "/c/jf/v1/progress", key, new { key = mediaKey, position, duration, finished }, ct);
@@ -67,7 +67,7 @@ public class MarqueeClient
     public Task<JsonElement> DisconnectAsync(string serverUrl, string key, CancellationToken ct)
         => SendAsync<JsonElement>(HttpMethod.Post, serverUrl, "/c/jf/v1/disconnect", key, new { }, ct);
 
-    /// <summary>Downloads a file Marquee signed (stream or subtitles) as text.</summary>
+    /// <summary>Downloads a file Lilin signed (stream or subtitles) as text.</summary>
     public async Task<string> GetTextAsync(string url, CancellationToken ct)
     {
         using var client = _httpClientFactory.CreateClient(NamedClient.Default);
@@ -99,11 +99,11 @@ public class MarqueeClient
         }
         catch (HttpRequestException e)
         {
-            throw new MarqueeException($"Couldn't reach Marquee at {serverUrl} ({e.Message}).");
+            throw new LilinException($"Couldn't reach Lilin at {serverUrl} ({e.Message}).");
         }
         catch (TaskCanceledException) when (!ct.IsCancellationRequested)
         {
-            throw new MarqueeException($"Marquee at {serverUrl} didn't answer in time.");
+            throw new LilinException($"Lilin at {serverUrl} didn't answer in time.");
         }
 
         using (response)
@@ -118,24 +118,24 @@ public class MarqueeClient
                 }
                 catch (JsonException)
                 {
-                    // A proxy's error page, not Marquee's.
+                    // A proxy's error page, not Lilin's.
                 }
 
                 if (response.StatusCode == HttpStatusCode.Forbidden || (message is null && response.Headers.Contains("cf-ray")))
                 {
-                    message ??= "Cloudflare refused the request. Marquee's /c/ path must be bypassed in Cloudflare Access.";
+                    message ??= "Cloudflare refused the request. Lilin's /c/ path must be bypassed in Cloudflare Access.";
                 }
 
-                throw new MarqueeException(message ?? $"Marquee answered {(int)response.StatusCode} {response.ReasonPhrase}.", response.StatusCode);
+                throw new LilinException(message ?? $"Lilin answered {(int)response.StatusCode} {response.ReasonPhrase}.", response.StatusCode);
             }
 
             try
             {
-                return JsonSerializer.Deserialize<T>(text, Json) ?? throw new MarqueeException("Marquee sent an empty answer.");
+                return JsonSerializer.Deserialize<T>(text, Json) ?? throw new LilinException("Lilin sent an empty answer.");
             }
             catch (JsonException)
             {
-                throw new MarqueeException("That address answered, but not like Marquee. Check the address (and that Marquee is up to date).");
+                throw new LilinException("That address answered, but not like Lilin. Check the address (and that Lilin is up to date).");
             }
         }
     }
@@ -147,9 +147,9 @@ public class MarqueeClient
 }
 
 /// <summary>A failure worth showing as it is.</summary>
-public class MarqueeException : Exception
+public class LilinException : Exception
 {
-    public MarqueeException(string message, HttpStatusCode? status = null)
+    public LilinException(string message, HttpStatusCode? status = null)
         : base(message)
     {
         Status = status;
@@ -176,28 +176,28 @@ public class PairPoll
     public string? Name { get; set; }
 }
 
-public class MarqueeLibrary
+public class LilinLibrary
 {
-    public MarqueeAccount Account { get; set; } = new();
+    public LilinAccount Account { get; set; } = new();
 
-    public List<MarqueeFilm> Films { get; set; } = [];
+    public List<LilinFilm> Films { get; set; } = [];
 
-    public List<MarqueeShow> Shows { get; set; } = [];
+    public List<LilinShow> Shows { get; set; } = [];
 }
 
-public class MarqueeAccount
+public class LilinAccount
 {
     public string Name { get; set; } = string.Empty;
 }
 
-public class MarqueeSubtitle
+public class LilinSubtitle
 {
     public string Lang { get; set; } = string.Empty;
 
     public string Url { get; set; } = string.Empty;
 }
 
-public class MarqueeProgress
+public class LilinProgress
 {
     public double Position { get; set; }
 
@@ -206,11 +206,11 @@ public class MarqueeProgress
     public long At { get; set; }
 }
 
-public class MarqueeVideo
+public class LilinVideo
 {
     public string Id { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets Marquee's media key: the same video across MKV → MP4 conversion.</summary>
+    /// <summary>Gets or sets Lilin's media key: the same video across MKV → MP4 conversion.</summary>
     public string Key { get; set; } = string.Empty;
 
     public string File { get; set; } = string.Empty;
@@ -221,12 +221,12 @@ public class MarqueeVideo
 
     public string Stream { get; set; } = string.Empty;
 
-    public List<MarqueeSubtitle> Subtitles { get; set; } = [];
+    public List<LilinSubtitle> Subtitles { get; set; } = [];
 
-    public MarqueeProgress? Progress { get; set; }
+    public LilinProgress? Progress { get; set; }
 }
 
-public class MarqueeFilm : MarqueeVideo
+public class LilinFilm : LilinVideo
 {
     public string Title { get; set; } = string.Empty;
 
@@ -235,7 +235,7 @@ public class MarqueeFilm : MarqueeVideo
     public long? TmdbId { get; set; }
 }
 
-public class MarqueeEpisode : MarqueeVideo
+public class LilinEpisode : LilinVideo
 {
     public int Season { get; set; }
 
@@ -246,7 +246,7 @@ public class MarqueeEpisode : MarqueeVideo
     public string? Title { get; set; }
 }
 
-public class MarqueeShow
+public class LilinShow
 {
     public string Id { get; set; } = string.Empty;
 
@@ -256,5 +256,5 @@ public class MarqueeShow
 
     public long? TmdbId { get; set; }
 
-    public List<MarqueeEpisode> Episodes { get; set; } = [];
+    public List<LilinEpisode> Episodes { get; set; } = [];
 }

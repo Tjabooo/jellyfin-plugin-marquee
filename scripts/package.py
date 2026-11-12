@@ -3,7 +3,7 @@
 
     python3 scripts/package.py v0.1.0 [--repo owner/name]
 
-Writes dist/marquee_<version>.zip per Jellyfin line and puts their entries at the top of
+Writes dist/lilin_<version>.zip per Jellyfin line and puts their entries at the top of
 manifest.json (the plugin repository Jellyfin reads). The fourth version number is the Jellyfin
 major version the zip is for (12 or 10), so a server always picks the newest build it can run.
 """
@@ -19,7 +19,7 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-PROJECT = ROOT / 'Jellyfin.Plugin.Marquee' / 'Jellyfin.Plugin.Marquee.csproj'
+PROJECT = ROOT / 'Jellyfin.Plugin.Lilin' / 'Jellyfin.Plugin.Lilin.csproj'
 # (target framework, targetAbi, fourth version number)
 LINES = [('net10.0', '12.0.0.0', 12), ('net9.0', '10.11.0.0', 10)]
 
@@ -64,11 +64,11 @@ def main():
             'category': plugin['category'], 'changelog': changelog, 'description': plugin['description'],
             'guid': plugin['guid'], 'name': plugin['name'], 'overview': plugin['overview'], 'owner': plugin['owner'],
             'targetAbi': abi, 'timestamp': now, 'version': version, 'status': 'Active', 'autoUpdate': True,
-            'imagePath': '', 'assemblies': ['Jellyfin.Plugin.Marquee.dll'],
+            'imagePath': '', 'assemblies': ['Jellyfin.Plugin.Lilin.dll'],
         }
-        zip_path = dist / f'marquee_{version}.zip'
+        zip_path = dist / f'lilin_{version}.zip'
         with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as z:
-            z.write(out / 'Jellyfin.Plugin.Marquee.dll', 'Jellyfin.Plugin.Marquee.dll')
+            z.write(out / 'Jellyfin.Plugin.Lilin.dll', 'Jellyfin.Plugin.Lilin.dll')
             z.writestr('meta.json', json.dumps(meta, indent=2))
         entries.append({
             'version': version, 'changelog': changelog, 'targetAbi': abi,

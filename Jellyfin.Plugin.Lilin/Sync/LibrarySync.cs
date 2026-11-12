@@ -12,25 +12,25 @@ using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Marquee.Sync;
+namespace Jellyfin.Plugin.Lilin.Sync;
 
 /// <summary>
-/// Mirrors the Marquee library into the plugin's folder: writes .strm files and subtitles, removes what
-/// left Marquee, and tells Jellyfin what changed. Only files this plugin wrote (listed in
-/// .marquee-sync.json) are ever deleted.
+/// Mirrors the Lilin library into the plugin's folder: writes .strm files and subtitles, removes what
+/// left Lilin, and tells Jellyfin what changed. Only files this plugin wrote (listed in
+/// .lilin-sync.json) are ever deleted.
 /// </summary>
 public class LibrarySync
 {
-    private const string ManifestName = ".marquee-sync.json";
+    private const string ManifestName = ".lilin-sync.json";
     private static readonly TimeSpan FreshSubtitles = TimeSpan.FromDays(2);
-    private readonly MarqueeClient _client;
+    private readonly LilinClient _client;
     private readonly ILibraryManager _libraryManager;
     private readonly ILibraryMonitor _libraryMonitor;
     private readonly ILogger<LibrarySync> _logger;
     private readonly SemaphoreSlim _running = new(1, 1);
     private Dictionary<string, string> _keysByPath = new(StringComparer.OrdinalIgnoreCase);
 
-    public LibrarySync(MarqueeClient client, ILibraryManager libraryManager, ILibraryMonitor libraryMonitor, ILogger<LibrarySync> logger)
+    public LibrarySync(LilinClient client, ILibraryManager libraryManager, ILibraryMonitor libraryMonitor, ILogger<LibrarySync> logger)
     {
         _client = client;
         _libraryManager = libraryManager;
@@ -38,9 +38,9 @@ public class LibrarySync
         _logger = logger;
     }
 
-    private static Plugin Plugin => Plugin.Instance ?? throw new InvalidOperationException("The Marquee plugin isn't loaded.");
+    private static Plugin Plugin => Plugin.Instance ?? throw new InvalidOperationException("The Lilin plugin isn't loaded.");
 
-    /// <summary>Marquee's media key for a .strm file this plugin wrote, or null.</summary>
+    /// <summary>Lilin's media key for a .strm file this plugin wrote, or null.</summary>
     public string? MediaKeyFor(string? path)
     {
         if (string.IsNullOrEmpty(path))
@@ -61,13 +61,13 @@ public class LibrarySync
         var config = Plugin.Configuration;
         if (string.IsNullOrEmpty(config.Key) || string.IsNullOrEmpty(config.ServerUrl))
         {
-            _logger.LogDebug("Marquee isn't connected; nothing to sync");
+            _logger.LogDebug("Lilin isn't connected; nothing to sync");
             return;
         }
 
         if (!await _running.WaitAsync(0, ct).ConfigureAwait(false))
         {
-            _logger.LogInformation("A Marquee sync is already running");
+            _logger.LogInformation("A Lilin sync is already running");
             return;
         }
 
@@ -79,20 +79,20 @@ public class LibrarySync
             config.AccountName = library.Account.Name;
             config.LastError = string.Empty;
             config.LastSyncSummary = summary;
-            _logger.LogInformation("Marquee sync: {Summary}", summary);
+            _logger.LogInformation("Lilin sync: {Summary}", summary);
         }
-        catch (MarqueeException e)
+        catch (LilinException e)
         {
             config.LastError = e.Message;
             if (e.Status == System.Net.HttpStatusCode.Unauthorized)
             {
-                // Disconnected in Marquee: the .strm links no longer work either, so they go.
+                // Disconnected in Lilin: the .strm links no longer work either, so they go.
                 config.Key = string.Empty;
-                config.LastError = "Marquee disconnected this server. Connect again to see the library.";
+                config.LastError = "Lilin disconnected this server. Connect again to see the library.";
                 RemoveAll();
             }
 
-            _logger.LogWarning("Marquee sync failed: {Message}", e.Message);
+            _logger.LogWarning("Lilin sync failed: {Message}", e.Message);
             throw;
         }
         finally
@@ -119,7 +119,7 @@ public class LibrarySync
         Notify(changed);
     }
 
-    private async Task<string> ApplyAsync(MarqueeLibrary library, string serverUrl, bool subtitles, IProgress<double>? progress, CancellationToken ct)
+    private async Task<string> ApplyAsync(LilinLibrary library, string serverUrl, bool subtitles, IProgress<double>? progress, CancellationToken ct)
     {
         var root = Plugin.LibraryPath;
         var plan = SyncPlan.Build(library, serverUrl);
@@ -161,7 +161,7 @@ public class LibrarySync
                 {
                     next.Subtitles.Add(sub.RelativePath);
                     var subPath = Path.Combine(root, sub.RelativePath);
-                    // New videos get their subtitles again for a while: Marquee fixes their timing after download.
+                    // New videos get their subtitles again for a while: Lilin fixes their timing after download.
                     var stale = !File.Exists(subPath) || (fresh && DateTime.UtcNow - File.GetLastWriteTimeUtc(subPath) > TimeSpan.FromHours(3));
                     if (!stale)
                     {
@@ -251,15 +251,15 @@ public class LibrarySync
 
     private static string Count(int n, string what) => n == 1 ? $"1 {what}" : $"{n} {what}s";
 
-    // "Marquee Films" and "Marquee Shows", unless some library already covers those folders.
+    // "Lilin Films" and "Lilin Shows", unless some library already covers those folders.
     private async Task<bool> EnsureLibrariesAsync(string root)
     {
         var folders = _libraryManager.GetVirtualFolders();
         var made = false;
         foreach (var (name, sub, type) in new[]
         {
-            ("Marquee Films", SyncPlan.FilmsFolder, CollectionTypeOptions.movies),
-            ("Marquee Shows", SyncPlan.ShowsFolder, CollectionTypeOptions.tvshows),
+            ("Lilin Films", SyncPlan.FilmsFolder, CollectionTypeOptions.movies),
+            ("Lilin Shows", SyncPlan.ShowsFolder, CollectionTypeOptions.tvshows),
         })
         {
             var path = Path.Combine(root, sub);

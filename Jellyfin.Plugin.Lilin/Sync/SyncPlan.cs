@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Jellyfin.Plugin.Marquee.Sync;
+namespace Jellyfin.Plugin.Lilin.Sync;
 
 /// <summary>One .strm file to have on disk, with the subtitles beside it.</summary>
 public sealed record PlannedVideo(string RelativePath, string Url, string MediaKey, long AddedMs, IReadOnlyList<PlannedSubtitle> Subtitles);
@@ -15,7 +15,7 @@ public sealed record PlannedVideo(string RelativePath, string Url, string MediaK
 public sealed record PlannedSubtitle(string RelativePath, string Url);
 
 /// <summary>
-/// Turns Marquee's library into Jellyfin's naming: Films/Title (Year) [tmdbid-1]/Title (Year).strm and
+/// Turns Lilin's library into Jellyfin's naming: Films/Title (Year) [tmdbid-1]/Title (Year).strm and
 /// Shows/Show (Year) [tmdbid-2]/Season 01/Show S01E02.strm. No disk access, so it's easy to test.
 /// </summary>
 public static partial class SyncPlan
@@ -23,7 +23,7 @@ public static partial class SyncPlan
     public const string FilmsFolder = "Films";
     public const string ShowsFolder = "Shows";
 
-    public static List<PlannedVideo> Build(MarqueeLibrary library, string serverUrl)
+    public static List<PlannedVideo> Build(LilinLibrary library, string serverUrl)
     {
         var plan = new List<PlannedVideo>();
         var taken = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -89,7 +89,7 @@ public static partial class SyncPlan
         return rel;
     }
 
-    private static PlannedVideo Video(string rel, MarqueeVideo v, string serverUrl)
+    private static PlannedVideo Video(string rel, LilinVideo v, string serverUrl)
     {
         var stem = rel[..^".strm".Length];
         var subs = v.Subtitles
@@ -99,7 +99,7 @@ public static partial class SyncPlan
             .ToList();
         if (!v.Stream.StartsWith('/'))
         {
-            throw new MarqueeException("Marquee sent a stream link this plugin doesn't understand. Update the plugin.");
+            throw new LilinException("Lilin sent a stream link this plugin doesn't understand. Update the plugin.");
         }
 
         return new PlannedVideo(rel, serverUrl + v.Stream, v.Key, v.Added, subs);

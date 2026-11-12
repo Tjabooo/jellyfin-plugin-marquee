@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using MediaBrowser.Model.Tasks;
 
-namespace Jellyfin.Plugin.Marquee.Sync;
+namespace Jellyfin.Plugin.Lilin.Sync;
 
-/// <summary>Dashboard → Scheduled Tasks → Marquee → Sync Marquee library.</summary>
+/// <summary>Dashboard → Scheduled Tasks → Lilin → Sync Lilin library.</summary>
 public class SyncTask : IScheduledTask
 {
     private readonly LibrarySync _sync;
@@ -16,13 +16,13 @@ public class SyncTask : IScheduledTask
         _sync = sync;
     }
 
-    public string Name => "Sync Marquee library";
+    public string Name => "Sync Lilin library";
 
-    public string Key => "MarqueeLibrarySync";
+    public string Key => "LilinLibrarySync";
 
-    public string Description => "Brings new films and episodes from Marquee into Jellyfin and removes ones that left.";
+    public string Description => "Brings new films and episodes from Lilin into Jellyfin and removes ones that left.";
 
-    public string Category => "Marquee";
+    public string Category => "Lilin";
 
     public Task ExecuteAsync(IProgress<double> progress, CancellationToken cancellationToken) => _sync.RunAsync(progress, cancellationToken);
 

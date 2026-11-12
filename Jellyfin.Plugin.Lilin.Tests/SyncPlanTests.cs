@@ -1,32 +1,32 @@
 using System.IO;
 using System.Linq;
-using Jellyfin.Plugin.Marquee.Sync;
+using Jellyfin.Plugin.Lilin.Sync;
 using Xunit;
 
-namespace Jellyfin.Plugin.Marquee.Tests;
+namespace Jellyfin.Plugin.Lilin.Tests;
 
 public class SyncPlanTests
 {
-    private const string Server = "https://marquee.example.com";
+    private const string Server = "https://lilin.example.com";
 
-    private static MarqueeLibrary Library() => new()
+    private static LilinLibrary Library() => new()
     {
         Films =
         {
-            new MarqueeFilm { Id = "a", Key = "films/heat", Title = "Heat", Year = 1995, TmdbId = 949, Stream = "/c/jf/v1/s/l/sig/a/Heat.mp4", Added = 1,
-                Subtitles = { new MarqueeSubtitle { Lang = "sv", Url = "/c/jf/v1/t/l/sig/a/sv.srt" }, new MarqueeSubtitle { Lang = "../x", Url = "/bad" } } },
-            new MarqueeFilm { Id = "b", Key = "films/heat-4k", Title = "Heat", Year = 1995, TmdbId = 949, Stream = "/c/jf/v1/s/l/sig/b/Heat.mp4", Added = 2 },
-            new MarqueeFilm { Id = "c", Key = "films/what", Title = "What? Why: Now/Then.", Stream = "/c/jf/v1/s/l/sig/c/x.mp4" },
+            new LilinFilm { Id = "a", Key = "films/heat", Title = "Heat", Year = 1995, TmdbId = 949, Stream = "/c/jf/v1/s/l/sig/a/Heat.mp4", Added = 1,
+                Subtitles = { new LilinSubtitle { Lang = "sv", Url = "/c/jf/v1/t/l/sig/a/sv.srt" }, new LilinSubtitle { Lang = "../x", Url = "/bad" } } },
+            new LilinFilm { Id = "b", Key = "films/heat-4k", Title = "Heat", Year = 1995, TmdbId = 949, Stream = "/c/jf/v1/s/l/sig/b/Heat.mp4", Added = 2 },
+            new LilinFilm { Id = "c", Key = "films/what", Title = "What? Why: Now/Then.", Stream = "/c/jf/v1/s/l/sig/c/x.mp4" },
         },
         Shows =
         {
-            new MarqueeShow
+            new LilinShow
             {
                 Id = "s", Title = "The Bear", Year = 2022, TmdbId = 136315,
                 Episodes =
                 {
-                    new MarqueeEpisode { Id = "e2", Key = "tv/bear/s01e02", Season = 1, Episode = 2, EpisodeEnd = 3, Stream = "/c/jf/v1/s/l/sig/e2/x.mp4" },
-                    new MarqueeEpisode { Id = "e0", Key = "tv/bear/s00e01", Season = 0, Episode = 1, Stream = "/c/jf/v1/s/l/sig/e0/x.mp4" },
+                    new LilinEpisode { Id = "e2", Key = "tv/bear/s01e02", Season = 1, Episode = 2, EpisodeEnd = 3, Stream = "/c/jf/v1/s/l/sig/e2/x.mp4" },
+                    new LilinEpisode { Id = "e0", Key = "tv/bear/s00e01", Season = 0, Episode = 1, Stream = "/c/jf/v1/s/l/sig/e0/x.mp4" },
                 },
             },
         },
@@ -61,16 +61,16 @@ public class SyncPlanTests
     public void NamesAreSafeOnEveryFileSystem(string name, string expected) => Assert.Equal(expected, SyncPlan.CleanName(name));
 
     [Theory]
-    [InlineData("marquee.example.com", "https://marquee.example.com")]
-    [InlineData("https://marquee.example.com/", "https://marquee.example.com")]
+    [InlineData("lilin.example.com", "https://lilin.example.com")]
+    [InlineData("https://lilin.example.com/", "https://lilin.example.com")]
     [InlineData("192.168.1.10:8080", "http://192.168.1.10:8080")]
     [InlineData("mediabox:8080", "http://mediabox:8080")]
     [InlineData("media.local", "http://media.local")]
     [InlineData("http://10.0.0.5:8080/", "http://10.0.0.5:8080")]
-    public void AddressesAreNormalized(string input, string expected) => Assert.Equal(expected, MarqueeClient.NormalizeUrl(input));
+    public void AddressesAreNormalized(string input, string expected) => Assert.Equal(expected, LilinClient.NormalizeUrl(input));
 
     [Theory]
     [InlineData("")]
     [InlineData("ftp://x")]
-    public void BadAddressesAreRefused(string input) => Assert.Throws<MarqueeException>(() => MarqueeClient.NormalizeUrl(input));
+    public void BadAddressesAreRefused(string input) => Assert.Throws<LilinException>(() => LilinClient.NormalizeUrl(input));
 }

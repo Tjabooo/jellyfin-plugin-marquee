@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Jellyfin.Plugin.Marquee\Jellyfin.Plugin.Marquee.csproj" SetTargetFramework="TargetFramework=net10.0" />
+    <ProjectReference Include="..\Jellyfin.Plugin.Lilin\Jellyfin.Plugin.Lilin.csproj" SetTargetFramework="TargetFramework=net10.0" />
   </ItemGroup>
 
 </Project>

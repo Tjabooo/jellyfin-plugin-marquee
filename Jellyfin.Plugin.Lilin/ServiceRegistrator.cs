@@ -1,15 +1,15 @@
-using Jellyfin.Plugin.Marquee.Sync;
+using Jellyfin.Plugin.Lilin.Sync;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Jellyfin.Plugin.Marquee;
+namespace Jellyfin.Plugin.Lilin;
 
 public class ServiceRegistrator : IPluginServiceRegistrator
 {
     public void RegisterServices(IServiceCollection serviceCollection, IServerApplicationHost applicationHost)
     {
-        serviceCollection.AddSingleton<MarqueeClient>();
+        serviceCollection.AddSingleton<LilinClient>();
         serviceCollection.AddSingleton<LibrarySync>();
         serviceCollection.AddHostedService<ProgressReporter>();
     }

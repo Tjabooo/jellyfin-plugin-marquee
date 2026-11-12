@@ -7,10 +7,10 @@ using MediaBrowser.Controller.Session;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Jellyfin.Plugin.Marquee.Sync;
+namespace Jellyfin.Plugin.Lilin.Sync;
 
 /// <summary>
-/// Sends what's watched in Jellyfin back to Marquee, so Continue watching there picks up where Jellyfin
+/// Sends what's watched in Jellyfin back to Lilin, so Continue watching there picks up where Jellyfin
 /// stopped: every 30 seconds while playing, at stop, and "finished" when Jellyfin counts it as played.
 /// </summary>
 public sealed class ProgressReporter : IHostedService, IDisposable
@@ -18,12 +18,12 @@ public sealed class ProgressReporter : IHostedService, IDisposable
     private static readonly TimeSpan Every = TimeSpan.FromSeconds(30);
     private readonly ISessionManager _sessions;
     private readonly LibrarySync _sync;
-    private readonly MarqueeClient _client;
+    private readonly LilinClient _client;
     private readonly ILogger<ProgressReporter> _logger;
     private readonly ConcurrentDictionary<string, DateTime> _lastSent = new();
     private readonly CancellationTokenSource _stopping = new();
 
-    public ProgressReporter(ISessionManager sessions, LibrarySync sync, MarqueeClient client, ILogger<ProgressReporter> logger)
+    public ProgressReporter(ISessionManager sessions, LibrarySync sync, LilinClient client, ILogger<ProgressReporter> logger)
     {
         _sessions = sessions;
         _sync = sync;
@@ -94,7 +94,7 @@ public sealed class ProgressReporter : IHostedService, IDisposable
         var config = Plugin.Instance!.Configuration;
         var position = (e.PlaybackPositionTicks ?? 0) / (double)TimeSpan.TicksPerSecond;
         var duration = (e.Item.RunTimeTicks ?? 0) / (double)TimeSpan.TicksPerSecond;
-        // Without a known length Marquee can't place the position; at the very start there's nothing to keep.
+        // Without a known length Lilin can't place the position; at the very start there's nothing to keep.
         if (!finished && (duration <= 0 || position < 5))
         {
             return;
@@ -109,9 +109,9 @@ public sealed class ProgressReporter : IHostedService, IDisposable
                 {
                     await _client.ReportProgressAsync(server, secret, key, finished ? null : position, finished ? null : duration, finished, _stopping.Token).ConfigureAwait(false);
                 }
-                catch (Exception ex) when (ex is MarqueeException or OperationCanceledException)
+                catch (Exception ex) when (ex is LilinException or OperationCanceledException)
                 {
-                    _logger.LogDebug("Couldn't send progress to Marquee: {Message}", ex.Message);
+                    _logger.LogDebug("Couldn't send progress to Lilin: {Message}", ex.Message);
                 }
             },
             _stopping.Token);

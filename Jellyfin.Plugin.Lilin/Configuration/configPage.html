@@ -2,88 +2,88 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Marquee</title>
+    <title>Lilin</title>
 </head>
 <body>
-    <div id="MarqueeConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
+    <div id="LilinConfigPage" data-role="page" class="page type-interior pluginConfigurationPage" data-require="emby-input,emby-button,emby-checkbox">
         <style>
-            #MarqueeConfigPage .mq-card { max-width: 44em; padding: 1.2em 1.4em; margin: 0 0 1.6em; border-radius: .6em; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
-            #MarqueeConfigPage .mq-lead { margin: .2em 0 1.2em; opacity: .85; line-height: 1.5; max-width: 44em; }
-            #MarqueeConfigPage .mq-code { font: 600 2.6em/1.1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .22em; margin: .3em 0 .2em; user-select: all; }
-            #MarqueeConfigPage .mq-muted { opacity: .7; margin: .3em 0; line-height: 1.5; }
-            #MarqueeConfigPage .mq-error { color: #ff7b72; margin: .6em 0 0; line-height: 1.5; }
-            #MarqueeConfigPage .mq-error:empty, #MarqueeConfigPage [hidden] { display: none !important; }
-            #MarqueeConfigPage .mq-row { display: flex; flex-wrap: wrap; gap: .6em; align-items: center; margin-top: 1em; }
-            #MarqueeConfigPage .mq-row .emby-button { margin: 0; }
-            #MarqueeConfigPage .mq-state { display: grid; grid-template-columns: max-content 1fr; gap: .35em 1.2em; margin: .4em 0 0; }
-            #MarqueeConfigPage .mq-state dt { opacity: .65; }
-            #MarqueeConfigPage .mq-state dd { margin: 0; overflow-wrap: anywhere; }
-            #MarqueeConfigPage h2 { margin: 0 0 .4em; font-size: 1.15em; }
+            #LilinConfigPage .lil-card { max-width: 44em; padding: 1.2em 1.4em; margin: 0 0 1.6em; border-radius: .6em; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+            #LilinConfigPage .lil-lead { margin: .2em 0 1.2em; opacity: .85; line-height: 1.5; max-width: 44em; }
+            #LilinConfigPage .lil-code { font: 600 2.6em/1.1 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: .22em; margin: .3em 0 .2em; user-select: all; }
+            #LilinConfigPage .lil-muted { opacity: .7; margin: .3em 0; line-height: 1.5; }
+            #LilinConfigPage .lil-error { color: #ff7b72; margin: .6em 0 0; line-height: 1.5; }
+            #LilinConfigPage .lil-error:empty, #LilinConfigPage [hidden] { display: none !important; }
+            #LilinConfigPage .lil-row { display: flex; flex-wrap: wrap; gap: .6em; align-items: center; margin-top: 1em; }
+            #LilinConfigPage .lil-row .emby-button { margin: 0; }
+            #LilinConfigPage .lil-state { display: grid; grid-template-columns: max-content 1fr; gap: .35em 1.2em; margin: .4em 0 0; }
+            #LilinConfigPage .lil-state dt { opacity: .65; }
+            #LilinConfigPage .lil-state dd { margin: 0; overflow-wrap: anywhere; }
+            #LilinConfigPage h2 { margin: 0 0 .4em; font-size: 1.15em; }
         </style>
         <div data-role="content">
             <div class="content-primary">
                 <div class="verticalSection">
-                    <h1 class="sectionTitle">Marquee</h1>
-                    <p class="mq-lead">Shows a Marquee library in this Jellyfin. Films and shows appear as normal Jellyfin libraries, play from the Marquee server, and what you watch here is remembered in Marquee too.</p>
+                    <h1 class="sectionTitle">Lilin</h1>
+                    <p class="lil-lead">Shows a Lilin library in this Jellyfin. Films and shows appear as normal Jellyfin libraries, play from the Lilin server, and what you watch here is remembered in Lilin too.</p>
                 </div>
 
-                <!-- Not connected: address, then the code to enter in Marquee -->
-                <div class="mq-card" id="mqConnect" hidden>
-                    <h2>Connect to Marquee</h2>
+                <!-- Not connected: address, then the code to enter in Lilin -->
+                <div class="lil-card" id="mqConnect" hidden>
+                    <h2>Connect to Lilin</h2>
                     <form id="mqConnectForm">
                         <div class="inputContainer">
-                            <input is="emby-input" type="text" id="mqUrl" label="Marquee address" placeholder="https://marquee.example.com" autocomplete="url" spellcheck="false" required />
-                            <div class="fieldDescription">The address you open Marquee at in a browser. Use the home-network address (like http://192.168.1.10:8080) if this Jellyfin is in the same house.</div>
+                            <input is="emby-input" type="text" id="mqUrl" label="Lilin address" placeholder="https://lilin.example.com" autocomplete="url" spellcheck="false" required />
+                            <div class="fieldDescription">The address you open Lilin at in a browser. Use the home-network address (like http://192.168.1.10:8080) if this Jellyfin is in the same house.</div>
                         </div>
                         <button is="emby-button" type="submit" class="raised button-submit block emby-button" id="mqStart"><span>Get a code</span></button>
                     </form>
                     <div id="mqPairing" hidden>
-                        <p class="mq-muted">In Marquee, open <b>Settings</b>, find <b>Jellyfin</b> and enter this code:</p>
-                        <div class="mq-code" id="mqCode"></div>
-                        <p class="mq-muted" id="mqPairNote">Waiting for the code…</p>
-                        <div class="mq-row"><button is="emby-button" type="button" class="raised emby-button" id="mqCancel"><span>Cancel</span></button></div>
+                        <p class="lil-muted">In Lilin, open <b>Settings</b>, find <b>Jellyfin</b> and enter this code:</p>
+                        <div class="lil-code" id="mqCode"></div>
+                        <p class="lil-muted" id="mqPairNote">Waiting for the code…</p>
+                        <div class="lil-row"><button is="emby-button" type="button" class="raised emby-button" id="mqCancel"><span>Cancel</span></button></div>
                     </div>
-                    <p class="mq-error" id="mqConnectError" role="alert"></p>
+                    <p class="lil-error" id="mqConnectError" role="alert"></p>
                 </div>
 
                 <!-- Connected -->
-                <div class="mq-card" id="mqConnected" hidden>
+                <div class="lil-card" id="mqConnected" hidden>
                     <h2>Connected</h2>
-                    <dl class="mq-state">
-                        <dt>Marquee</dt><dd id="mqServer"></dd>
+                    <dl class="lil-state">
+                        <dt>Lilin</dt><dd id="mqServer"></dd>
                         <dt>Library of</dt><dd id="mqAccount"></dd>
                         <dt>Last sync</dt><dd id="mqLastSync"></dd>
                     </dl>
-                    <p class="mq-error" id="mqSyncError" role="alert"></p>
-                    <div class="mq-row">
+                    <p class="lil-error" id="mqSyncError" role="alert"></p>
+                    <div class="lil-row">
                         <button is="emby-button" type="button" class="raised button-submit emby-button" id="mqSyncNow"><span>Sync now</span></button>
                         <button is="emby-button" type="button" class="raised emby-button" id="mqDisconnect"><span>Disconnect</span></button>
                     </div>
                 </div>
 
-                <div class="mq-card" id="mqOptions" hidden>
+                <div class="lil-card" id="mqOptions" hidden>
                     <h2>Options</h2>
                     <form id="mqOptionsForm">
                         <div class="inputContainer">
-                            <input is="emby-input" type="text" id="mqPath" label="Folder for Marquee's files" spellcheck="false" />
-                            <div class="fieldDescription" id="mqPathHint">Small .strm files that point at Marquee, one per video, plus subtitles. Leave empty for the default.</div>
+                            <input is="emby-input" type="text" id="mqPath" label="Folder for Lilin's files" spellcheck="false" />
+                            <div class="fieldDescription" id="mqPathHint">Small .strm files that point at Lilin, one per video, plus subtitles. Leave empty for the default.</div>
                         </div>
                         <div class="inputContainer">
-                            <input is="emby-input" type="number" id="mqInterval" label="Check Marquee every (minutes)" min="5" max="1440" />
+                            <input is="emby-input" type="number" id="mqInterval" label="Check Lilin every (minutes)" min="5" max="1440" />
                         </div>
                         <div class="checkboxContainer checkboxContainer-withDescription">
-                            <label><input is="emby-checkbox" type="checkbox" id="mqCreateLibraries" /><span>Add “Marquee Films” and “Marquee Shows” libraries</span></label>
+                            <label><input is="emby-checkbox" type="checkbox" id="mqCreateLibraries" /><span>Add “Lilin Films” and “Lilin Shows” libraries</span></label>
                             <div class="fieldDescription checkboxFieldDescription">Turn off to add the Films and Shows folders to libraries yourself.</div>
                         </div>
                         <div class="checkboxContainer checkboxContainer-withDescription">
-                            <label><input is="emby-checkbox" type="checkbox" id="mqReportProgress" /><span>Send watch progress to Marquee</span></label>
-                            <div class="fieldDescription checkboxFieldDescription">Continue watching in Marquee picks up where Jellyfin stopped. Everyone on this Jellyfin counts as the connected Marquee account.</div>
+                            <label><input is="emby-checkbox" type="checkbox" id="mqReportProgress" /><span>Send watch progress to Lilin</span></label>
+                            <div class="fieldDescription checkboxFieldDescription">Continue watching in Lilin picks up where Jellyfin stopped. Everyone on this Jellyfin counts as the connected Lilin account.</div>
                         </div>
                         <div class="checkboxContainer">
-                            <label><input is="emby-checkbox" type="checkbox" id="mqSubtitles" /><span>Copy subtitles saved in Marquee</span></label>
+                            <label><input is="emby-checkbox" type="checkbox" id="mqSubtitles" /><span>Copy subtitles saved in Lilin</span></label>
                         </div>
                         <button is="emby-button" type="submit" class="raised button-submit block emby-button"><span>Save</span></button>
-                        <p class="mq-error" id="mqOptionsError" role="alert"></p>
+                        <p class="lil-error" id="mqOptionsError" role="alert"></p>
                     </form>
                 </div>
             </div>
@@ -91,7 +91,7 @@
 
         <script type="text/javascript">
             (function () {
-                var page = document.querySelector('#MarqueeConfigPage');
+                var page = document.querySelector('#LilinConfigPage');
                 var $ = function (id) { return page.querySelector('#' + id); };
                 var pollTimer = null, statusTimer = null, pollId = null, pollUntil = 0;
 
@@ -137,7 +137,7 @@
                         page.dataset.optionsLoaded = '1';
                         $('mqPath').value = s.customLibraryPath || '';
                         $('mqPath').setAttribute('placeholder', s.defaultLibraryPath);
-                        $('mqPathHint').textContent = 'Small .strm files that point at Marquee, one per video, plus subtitles. Empty: ' + s.defaultLibraryPath;
+                        $('mqPathHint').textContent = 'Small .strm files that point at Lilin, one per video, plus subtitles. Empty: ' + s.defaultLibraryPath;
                         $('mqInterval').value = s.syncIntervalMinutes;
                         $('mqCreateLibraries').checked = s.createLibraries;
                         $('mqReportProgress').checked = s.reportProgress;
@@ -148,7 +148,7 @@
                 }
 
                 function refresh() {
-                    return call('GET', 'Marquee/Status').then(render).catch(function (e) { $('mqConnectError').textContent = e.message; });
+                    return call('GET', 'Lilin/Status').then(render).catch(function (e) { $('mqConnectError').textContent = e.message; });
                 }
 
                 function stopPairing() {
@@ -159,11 +159,11 @@
                 function poll() {
                     if (!pollId) return;
                     if (Date.now() > pollUntil) { stopPairing(); $('mqConnectError').textContent = 'The code expired. Get a new one.'; return; }
-                    call('GET', 'Marquee/Pair/Poll?id=' + encodeURIComponent(pollId)).then(function (r) {
+                    call('GET', 'Lilin/Pair/Poll?id=' + encodeURIComponent(pollId)).then(function (r) {
                         if (!pollId) return;
                         if (r.state === 'approved') {
                             stopPairing();
-                            Dashboard.alert('Connected to Marquee. The first sync is running; your films and shows appear in a minute or two.');
+                            Dashboard.alert('Connected to Lilin. The first sync is running; your films and shows appear in a minute or two.');
                             refresh();
                         } else if (r.state === 'waiting') {
                             var left = Math.max(0, Math.round((pollUntil - Date.now()) / 60000));
@@ -179,7 +179,7 @@
                     e.preventDefault();
                     $('mqConnectError').textContent = '';
                     $('mqStart').disabled = true;
-                    call('POST', 'Marquee/Pair/Start', { serverUrl: $('mqUrl').value }).then(function (r) {
+                    call('POST', 'Lilin/Pair/Start', { serverUrl: $('mqUrl').value }).then(function (r) {
                         $('mqUrl').value = r.serverUrl;
                         $('mqCode').textContent = r.code;
                         pollId = r.poll; pollUntil = Date.now() + r.expiresIn * 1000;
@@ -194,14 +194,14 @@
 
                 $('mqSyncNow').addEventListener('click', function () {
                     $('mqSyncNow').disabled = true;
-                    call('POST', 'Marquee/Sync').then(function () { setTimeout(refresh, 800); })
+                    call('POST', 'Lilin/Sync').then(function () { setTimeout(refresh, 800); })
                         .catch(function (e) { $('mqSyncError').textContent = e.message; $('mqSyncNow').disabled = false; });
                 });
 
                 $('mqDisconnect').addEventListener('click', function () {
-                    Dashboard.confirm('Jellyfin stops showing the Marquee library and its files here are deleted. You can connect again any time.', 'Disconnect from Marquee?', function (ok) {
+                    Dashboard.confirm('Jellyfin stops showing the Lilin library and its files here are deleted. You can connect again any time.', 'Disconnect from Lilin?', function (ok) {
                         if (!ok) return;
-                        call('POST', 'Marquee/Disconnect').then(function () { delete page.dataset.optionsLoaded; refresh(); })
+                        call('POST', 'Lilin/Disconnect').then(function () { delete page.dataset.optionsLoaded; refresh(); })
                             .catch(function (e) { $('mqSyncError').textContent = e.message; });
                     });
                 });
@@ -209,7 +209,7 @@
                 $('mqOptionsForm').addEventListener('submit', function (e) {
                     e.preventDefault();
                     $('mqOptionsError').textContent = '';
-                    call('POST', 'Marquee/Settings', {
+                    call('POST', 'Lilin/Settings', {
                         libraryPath: $('mqPath').value,
                         syncIntervalMinutes: parseInt($('mqInterval').value, 10) || 15,
                         createLibraries: $('mqCreateLibraries').checked,

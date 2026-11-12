@@ -3,7 +3,7 @@
   <!-- One codebase, two builds: net10.0 for Jellyfin 12.x, net9.0 for Jellyfin 10.11. -->
   <PropertyGroup>
     <TargetFrameworks>net10.0;net9.0</TargetFrameworks>
-    <RootNamespace>Jellyfin.Plugin.Marquee</RootNamespace>
+    <RootNamespace>Jellyfin.Plugin.Lilin</RootNamespace>
     <Nullable>enable</Nullable>
     <ImplicitUsings>disable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

@@ -1,32 +1,32 @@
 using MediaBrowser.Model.Plugins;
 
-namespace Jellyfin.Plugin.Marquee.Configuration;
+namespace Jellyfin.Plugin.Lilin.Configuration;
 
 /// <summary>
-/// Settings, kept in Jellyfin's plugin configuration folder. The key is a secret: it reads the Marquee
+/// Settings, kept in Jellyfin's plugin configuration folder. The key is a secret: it reads the Lilin
 /// library of the person who connected this server.
 /// </summary>
 public class PluginConfiguration : BasePluginConfiguration
 {
-    /// <summary>Gets or sets the Marquee address, e.g. https://marquee.example.com.</summary>
+    /// <summary>Gets or sets the Lilin address, e.g. https://lilin.example.com.</summary>
     public string ServerUrl { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the key Marquee handed over when the code was entered.</summary>
+    /// <summary>Gets or sets the key Lilin handed over when the code was entered.</summary>
     public string Key { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets the Marquee account's name, for the settings page.</summary>
+    /// <summary>Gets or sets the Lilin account's name, for the settings page.</summary>
     public string AccountName { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets where the .strm files go. Empty: Jellyfin's data folder/marquee.</summary>
+    /// <summary>Gets or sets where the .strm files go. Empty: Jellyfin's data folder/lilin.</summary>
     public string LibraryPath { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets a value indicating whether to add "Marquee Films" and "Marquee Shows" libraries.</summary>
+    /// <summary>Gets or sets a value indicating whether to add "Lilin Films" and "Lilin Shows" libraries.</summary>
     public bool CreateLibraries { get; set; } = true;
 
-    /// <summary>Gets or sets a value indicating whether watch progress in Jellyfin is sent to Marquee.</summary>
+    /// <summary>Gets or sets a value indicating whether watch progress in Jellyfin is sent to Lilin.</summary>
     public bool ReportProgress { get; set; } = true;
 
-    /// <summary>Gets or sets a value indicating whether subtitles saved in Marquee are copied beside each video.</summary>
+    /// <summary>Gets or sets a value indicating whether subtitles saved in Lilin are copied beside each video.</summary>
     public bool DownloadSubtitles { get; set; } = true;
 
     /// <summary>Gets or sets how often to sync, in minutes.</summary>

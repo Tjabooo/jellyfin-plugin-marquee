@@ -17,6 +17,6 @@ jobs:
         with:
           dotnet-version: '10.0.x'
       - name: Build (Jellyfin 12 and 10.11)
-        run: dotnet build Jellyfin.Plugin.Marquee/Jellyfin.Plugin.Marquee.csproj -c Release
+        run: dotnet build Jellyfin.Plugin.Lilin/Jellyfin.Plugin.Lilin.csproj -c Release
       - name: Test
-        run: dotnet test Jellyfin.Plugin.Marquee.Tests -c Release
+        run: dotnet test Jellyfin.Plugin.Lilin.Tests -c Release

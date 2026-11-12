@@ -3,30 +3,30 @@ using System.Collections.Concurrent;
 using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
-using Jellyfin.Plugin.Marquee.Sync;
+using Jellyfin.Plugin.Lilin.Sync;
 using MediaBrowser.Controller;
 using MediaBrowser.Model.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Jellyfin.Plugin.Marquee.Api;
+namespace Jellyfin.Plugin.Lilin.Api;
 
-/// <summary>The plugin's settings page talks to Marquee through these (a browser can't reach Marquee's API directly).</summary>
+/// <summary>The plugin's settings page talks to Lilin through these (a browser can't reach Lilin's API directly).</summary>
 [ApiController]
-[Route("Marquee")]
+[Route("Lilin")]
 [Authorize(Policy = "RequiresElevation")]
 [Produces(MediaTypeNames.Application.Json)]
-public class MarqueeController : ControllerBase
+public class LilinController : ControllerBase
 {
-    // Pairing in progress: poll id → Marquee address.
+    // Pairing in progress: poll id → Lilin address.
     private static readonly ConcurrentDictionary<string, (string Url, DateTime Started)> Pending = new();
-    private readonly MarqueeClient _client;
+    private readonly LilinClient _client;
     private readonly LibrarySync _sync;
     private readonly ITaskManager _tasks;
     private readonly IServerApplicationHost _host;
 
-    public MarqueeController(MarqueeClient client, LibrarySync sync, ITaskManager tasks, IServerApplicationHost host)
+    public LilinController(LilinClient client, LibrarySync sync, ITaskManager tasks, IServerApplicationHost host)
     {
         _client = client;
         _sync = sync;
@@ -71,7 +71,7 @@ public class MarqueeController : ControllerBase
     {
         try
         {
-            var url = MarqueeClient.NormalizeUrl(body.ServerUrl);
+            var url = LilinClient.NormalizeUrl(body.ServerUrl);
             var name = string.IsNullOrWhiteSpace(_host.FriendlyName) ? "Jellyfin" : _host.FriendlyName + " (Jellyfin)";
             var started = await _client.StartPairingAsync(url, name, ct).ConfigureAwait(false);
             foreach (var old in Pending)
@@ -85,7 +85,7 @@ public class MarqueeController : ControllerBase
             Pending[started.Poll] = (url, DateTime.UtcNow);
             return new { code = started.Code, poll = started.Poll, expiresIn = started.ExpiresIn, serverUrl = url };
         }
-        catch (MarqueeException e)
+        catch (LilinException e)
         {
             return BadRequest(new { error = e.Message });
         }
@@ -121,7 +121,7 @@ public class MarqueeController : ControllerBase
 
             return new { state = r.State };
         }
-        catch (MarqueeException e)
+        catch (LilinException e)
         {
             return BadRequest(new { error = e.Message });
         }
@@ -147,10 +147,10 @@ public class MarqueeController : ControllerBase
         var path = (body.LibraryPath ?? string.Empty).Trim();
         if (path.Length > 0 && !System.IO.Path.IsPathFullyQualified(path))
         {
-            return BadRequest(new { error = "The folder must be a full path, like /media/marquee or D:\\Marquee." });
+            return BadRequest(new { error = "The folder must be a full path, like /media/lilin or D:\\Lilin." });
         }
 
-        // Compare the folders, not the text: "/x/marquee/" (or the default typed out) is the same folder,
+        // Compare the folders, not the text: "/x/lilin/" (or the default typed out) is the same folder,
         // and treating it as a move would delete the library it is about to keep using.
         var newFolder = path.Length == 0 ? Plugin.DefaultLibraryPath : path;
         if (LibrarySync.SamePath(newFolder, Plugin.DefaultLibraryPath))
@@ -193,7 +193,7 @@ public class MarqueeController : ControllerBase
     {
         if (string.IsNullOrEmpty(Plugin.Configuration.Key))
         {
-            return BadRequest(new { error = "Connect to Marquee first." });
+            return BadRequest(new { error = "Connect to Lilin first." });
         }
 
         _tasks.QueueScheduledTask<SyncTask>();
@@ -210,7 +210,7 @@ public class MarqueeController : ControllerBase
             {
                 await _client.DisconnectAsync(c.ServerUrl, c.Key, ct).ConfigureAwait(false);
             }
-            catch (MarqueeException)
+            catch (LilinException)
             {
                 // Already disconnected there, or unreachable: forget the key here all the same.
             }
